@@ -1,42 +1,43 @@
 [![CircleCI](https://circleci.com/gh/KarimTarek/udacity-project-4/tree/master.svg?style=svg)](https://circleci.com/gh/KarimTarek/udacity-project-4/tree/master)
 
-## Project Overview
+## Project Summary
 
-In this project, you will apply the skills you have acquired in this course to operationalize a Machine Learning Microservice API. 
+This project is about dockerizing a python app which is used to predict housing prices using a dockerfile first to build the docker image which will contain the app and all of its dependencies then we were supposed to run the docker image using docker run command and expose the required ports to the docker host to be able to test the API call. Then we had to setup minikube which is the development version of kubernetes to be able to deploy our image (which we had to publish publicly on docker hub) on the cluster and also expose the container port to the host via port forwarding. Finally we had to setup circleci to add some tests and make sure the lints checks pass successfully with every change we do to the github repo.
 
-You are given a pre-trained, `sklearn` model that has been trained to predict housing prices in Boston according to several features, such as average rooms in a home and data about highway access, teacher-to-pupil ratios, and so on. You can read more about the data, which was initially taken from Kaggle, on [the data source site](https://www.kaggle.com/c/boston-housing). This project tests your ability to operationalize a Python flask app—in a provided file, `app.py`—that serves out predictions (inference) about housing prices through API calls. This project could be extended to any pre-trained machine learning model, such as those for image recognition and data labeling.
+### How to run the python scripts
 
-### Project Tasks
+	1) to run the python script in standalone mode (just python):
+		- Create a virtualenv and activate it
+		- Open up the terminal and make sure you are in the project directory then run `make install` to install the necessary dependencies
+		- run `python app.py`
 
-Your project goal is to operationalize this working, machine learning microservice using [kubernetes](https://kubernetes.io/), which is an open-source system for automating the management of containerized applications. In this project you will:
-* Test your project code using linting
-* Complete a Dockerfile to containerize this application
-* Deploy your containerized application using Docker and make a prediction
-* Improve the log statements in the source code for this application
-* Configure Kubernetes and create a Kubernetes cluster
-* Deploy a container using Kubernetes and make a prediction
-* Upload a complete Github repo with CircleCI to indicate that your code has been tested
+	2) to run the python app using docker:
+		- Open up the terminal and make sure you are in the project directory then run `./run_docker.sh` to build the image using the dockerfile included and run it using docker
+		- test using `./make_prediction` and a prediction should return
 
-You can find a detailed [project rubric, here](https://review.udacity.com/#!/rubrics/2576/view).
+	3) to run the python app on kubernetes:
+		- Make sure you installed minikube and that the vms are up and running then run `./run_kubernetes.sh` to get the image from docker hub then spin up a pod and port forward the ports exposed by the container to the host
+		- test using `./make_prediction` and a prediction should return
 
-**The final implementation of the project will showcase your abilities to operationalize production microservices.**
+### Folder Structure
+	- .circleci/config.yml: This folder holds the configuration for circleci to be able to test the whole app whenever anyone changes/pushes to the repository
+	
+	- upload_docker.sh: This script is responsible for logging into docker hub, tagging the image that we want to push then pushing it to the required repository with a specific tag
+	
+	- run_kubernetes.sh: This script is responsible for running a pod using the image we pushed to docked hub earlier with 'upload_docker.sh' and port forward the exposed port of the container to the host to be able to test it using 'make_prediction.sh'
 
----
+	- run_docker.sh: This script is used to build the application using the Dockerfile specified in the directory as well as running it ater the build process is complete
 
-## Setup the Environment
+	- requirements.txt: This file holds all the dependencies that we will need to run our python app
 
-* Create a virtualenv and activate it
-* Run `make install` to install the necessary dependencies
+	- output_txt_files: This folder contains the output files required for the project submission which includes the docker_out.txt and kubernetes_out.txt that contain logs related to each case
 
-### Running `app.py`
+	- make_prediction.sh: This file is used to make an API POST call to the python app to get a price prediction based on the features provided
 
-1. Standalone:  `python app.py`
-2. Run in Docker:  `./run_docker.sh`
-3. Run in Kubernetes:  `./run_kubernetes.sh`
+	- app.py: This is the flask application which holds all the endpoints which the application provides
 
-### Kubernetes Steps
+	- Dockerfile: The docker file which is use to build the housing market price app image
 
-* Setup and Configure Docker locally
-* Setup and Configure Kubernetes locally
-* Create Flask app in Container
-* Run via kubectl
+	- model_data: Folder containing the data in which the model was trained on
+
+	- Makefile: The Makefile includes instructions on environment setup and lint tests
